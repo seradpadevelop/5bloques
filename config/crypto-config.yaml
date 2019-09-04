@@ -1,0 +1,40 @@
+# Defines three organizations
+#  - Orderer organization
+#  - Org1  = Single peer organization
+#    Uses the "Specs" to declare the peers instead of Template
+#  - Org2  = Another peer organization
+# SOLUTION to the exercise
+
+##### Orderer for 5bloques
+OrdererOrgs:
+  - Name: Orderer
+    Domain: 5bloques.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer
+      
+#### Peers for 5bloques
+PeerOrgs:
+  # Peer configuration for ACME
+  - Name: 5bloques
+    Domain: 5bloques.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: 5bloques-peer1
+        CommonName: 5bloques-peer1
+    Users:
+      Count: 1
+
+  # Peer configuration for seradpa
+  - Name: seradpa
+    Domain: seradpa.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: seradpa-peer1
+        CommonName: seradpa-peer1
+    Users:
+      Count: 1
+
+
+
+      

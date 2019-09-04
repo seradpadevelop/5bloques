@@ -1,0 +1,67 @@
+name: Network
+version: '1.0'
+channels:
+  ehealthchannel:
+    orderers:
+      - orderer.5bloques.com
+    peers:
+      5bloques-peer1.5bloques.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      seradpa-peer1.seradpa.com:
+        endorsingPeer: true
+        chaincodeQuery: false
+        ledgerQuery: true
+        eventSource: false
+organizations:
+  5bloques:
+    mspid: 5bloquesMSP
+    peers:
+      - 5bloques-peer1.5bloques.com
+    certificateAuthorities:
+      - ca.caserver.com
+    adminPrivateKey:
+      path: >-
+        /vagrant/network/bin/../crypto/crypto-config/peerOrganizations/5bloques.com/users/Admin@5bloques.com/msp/keystore/2de85d725ae81a8babfb20be0574363e13476ebbd26ebbe46c3a2f5c3d4edad1_sk
+    signedCert:
+      path: >-
+        /vagrant/network/bin/../crypto/crypto-config/peerOrganizations/5bloques.com/users/Admin@5bloques.com/msp/signcerts/Admin@5bloques.com-cert.pem
+  seradpa:
+    mspid: seradpaMSP
+    peers:
+      - seradpa-peer1.seradpa.com
+    certificateAuthorities:
+      - ca.caserver.com
+    adminPrivateKey:
+      path: >-
+        /vagrant/network/bin/../crypto/crypto-config/peerOrganizations/seradpa.com/users/Admin@seradpa.com/msp/keystore/53c3769f14a231c155fa4b1872bc768be05c0560e77c7d41c6d27b6e169ac0a7_sk
+    signedCert:
+      path: >-
+        /vagrant/network/bin/../crypto/crypto-config/peerOrganizations/seradpa.com/users/Admin@seradpa.com/msp/signcerts/Admin@seradpa.com-cert.pem
+orderers:
+  orderer.5bloques.com:
+    url: 'grpc://localhost:7050'
+    grpcOptions:
+      ssl-target-name-override: orderer.5bloques.com
+      grpc-max-send-message-length: 15
+peers:
+  5bloques-peer1.5bloques.com:
+    url: 'grpc://localhost:7051'
+    grpcOptions:
+      ssl-target-name-override: 5bloques-peer1.5bloques.com
+      grpc.keepalive_time_ms: 600000
+  seradpa-peer1.seradpa.com:
+    url: 'grpc://localhost:8051'
+    grpcOptions:
+      ssl-target-name-override: seradpa-peer1.seradpa.com
+certificateAuthorities:
+  ca.caserver.com:
+    url: 'http://localhost:7054'
+    httpOptions:
+      verify: false
+    registrar:
+      - enrollId: admin
+        enrollSecret: adminpw
+    caName: caserver

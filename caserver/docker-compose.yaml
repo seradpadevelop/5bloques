@@ -1,0 +1,135 @@
+version: '2'
+
+networks:
+  ehealth:
+
+services:
+  # Orderer
+  orderer.5bloques.com:
+    container_name: orderer.5bloques.com
+    image: hyperledger/fabric-orderer:$IMAGE_TAG
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      # - ORDERER_GENERAL_LOGLEVEL=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=orderer.5bloques.com
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/genesis/ehealth-genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/msp
+      - ORDERER_FILELEDGER_LOCATION=/var/ledger
+    working_dir: $HOME
+    command: orderer
+    volumes:
+    # Folder with genesis block
+    - ${PWD}/config/orderer:/var/hyperledger/genesis
+    # Map the folder with MSP for orderer
+    - ${PWD}/client/orderer/orderer//msp:/var/hyperledger/msp
+    # Map the current folder to cfg
+    - ${PWD}/config/orderer:/var/hyperledger/config
+    - ${HOME}/ledgers/ca/orderer.5bloques.com:/var/ledger
+    ports:
+      - 7050:7050
+    networks:
+      - ehealth
+
+  # 5bloques peer1
+  5bloques-peer1.5bloques.com:
+    container_name: 5bloques-peer1.5bloques.com
+    image: hyperledger/fabric-peer:$IMAGE_TAG
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      # - CORE_LOGGING_LEVEL=debug
+      - FABRIC_LOGGING_SPEC=DEBUG
+
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_ehealth
+
+      - CORE_PEER_ID=5bloques-peer1.5bloques.com
+      # - CORE_PEER_LISTENADDRESS=seradpa-peer1.seradpa.com:7051
+      - CORE_PEER_ADDRESS=5bloques-peer1.5bloques.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=5bloques-peer1.5bloques.com:7051
+      # - CORE_PEER_ADDRESS=0.0.0.0:7051
+      # - CORE_PEER_GOSSIP_EXTERNALENDPOINT=0.0.0.0:7051
+
+      - CORE_PEER_LOCALMSPID=5bloquesMSP
+      - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+      - CORE_PEER_TLS_ENABLED=false
+      # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      # - CORE_PEER_GOSSIP_ORGLEADER=false
+      # - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_FILESYSTEMPATH=/var/ledger
+    working_dir: $HOME
+    # command: peer node start --peer-chaincodedev=true
+    command: peer node start
+
+    volumes:
+      # Folder with channel create tx file
+      - ${PWD}/config:/var/hyperledger/channeltx
+      # Map the folder with MSP for Peer
+      - ${PWD}/client/5bloques/peer1/msp:/var/hyperledger/msp
+      # Map the current folder to cfg
+      - ${PWD}/config:/var/hyperledger/config
+      - /var/run/:/host/var/run/
+      # Ledger folder for the peer
+      - ${HOME}/ledgers/ca/5bloques-peer1.5bloques.com/:/var/ledger
+    depends_on: 
+      - orderer.5bloques.com
+    ports:
+      - 7051:7051
+      - 7052:7052
+      - 7053:7053
+    networks:
+      - ehealth
+
+  # seradpa peer1
+  seradpa-peer1.seradpa.com:
+    container_name: seradpa-peer1.seradpa.com
+    image: hyperledger/fabric-peer:$IMAGE_TAG
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      # - CORE_LOGGING_LEVEL=debug
+      - FABRIC_LOGGING_SPEC=INFO
+
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_ehealth
+
+      - CORE_PEER_ID=seradpa-peer1.seradpa.com
+      - CORE_PEER_ADDRESS=seradpa-peer1.seradpa.com:8051
+      # - CORE_PEER_LISTENADDRESS=seradpa-peer1.seradpa.com:8051
+      - CORE_PEER_LISTENADDRESS=seradpa-peer1.seradpa.com:8051
+      - CORE_PEER_CHAINCODELISTENADDRESS=seradpa-peer1.seradpa.com:8052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=seradpa-peer1.seradpa.com:8051
+      - CORE_PEER_LOCALMSPID=seradpaMSP
+      - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+      - CORE_PEER_TLS_ENABLED=false
+      # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      # - CORE_PEER_GOSSIP_ORGLEADER=false
+      # - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_FILESYSTEMPATH=/var/ledger
+    working_dir: $HOME
+    # command: peer node start --peer-chaincodedev=true
+    command: peer node start
+
+    volumes:
+      # Folder with channel create tx file
+      - ${PWD}/config:/var/hyperledger/channeltx
+      # Map the folder with MSP for Peer
+      - ${PWD}/client/seradpa/peer1/msp:/var/hyperledger/msp
+      # Map the current folder to cfg
+      - ${PWD}/config:/var/hyperledger/config
+      - /var/run/:/host/var/run/
+      # Ledger folder for the peer
+      - ${HOME}/ledgers/ca/seradpa-peer1.seradpa.com:/var/ledger
+    depends_on: 
+      - orderer.5bloques.com
+    ports:
+      - 8051:8051
+      - 8052:8052
+      - 8053:8053
+    networks:
+      - ehealth
+
+  

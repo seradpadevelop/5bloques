@@ -1,0 +1,79 @@
+name: "Network"
+version: "1.0"
+
+channels:
+  ehealthchannel:
+    orderers:
+      - orderer.5bloques.com
+    peers:
+      5bloques-peer1.5bloques.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      seradpa-peer1.seradpa.com:
+        endorsingPeer: true
+        chaincodeQuery: false
+        ledgerQuery: true
+        eventSource: false
+
+organizations:
+  5bloques:
+    mspid: 5bloquesMSP
+    peers:
+      - 5bloques-peer1.5bloques.com
+    certificateAuthorities:
+      - ca.caserver.com
+    adminPrivateKey:
+      path: ../crypto/crypto-config/peerOrganizations/5bloques.com/users/Admin@5bloques.com/msp/keystore/e0e1ec4237fd02daae6699f53b5d485615bef5b57ec519dc58a7241c08f07ed1_sk
+    signedCert:
+      path: ../crypto/crypto-config/peerOrganizations/5bloques.com/users/Admin@5bloques.com/msp/signcerts/Admin@5bloques.com-cert.pem
+
+  seradpa:
+    mspid: seradpaMSP
+    peers:
+      - seradpa-peer1.seradpa.com
+    certificateAuthorities:
+      - ca.caserver.com
+    adminPrivateKey:
+      path: ../crypto/crypto-config/peerOrganizations/seradpa.com/users/Admin@seradpa.com/msp/keystore/05beac9849f610ad5cc8997e5f45343ca918de78398988def3f288b60d8ee27c_sk
+    signedCert:
+      path: ../crypto/crypto-config/peerOrganizations/seradpa.com/users/Admin@seradpa.com/msp/signcerts/Admin@seradpa.com-cert.pem
+
+orderers:
+  orderer.5bloques.com:
+    url: grpc://localhost:7050
+    grpcOptions:
+      ssl-target-name-override: orderer.5bloques.com
+      grpc-max-send-message-length: 15
+    # tlsCACerts:
+    #   path: ../crypto/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tlscacerts/example.com-cert.pem
+
+peers:
+  5bloques-peer1.5bloques.com:
+    url: grpc://localhost:7051
+    grpcOptions:
+      ssl-target-name-override: 5bloques-peer1.5bloques.com
+      grpc.keepalive_time_ms: 600000
+    # tlsCACerts:
+    #   path: ../crypto/crypto-config/peerOrganizations/5bloques.com/peers/peer0.5bloques.com/tlscacerts/5bloques.com-cert.pem
+
+  seradpa-peer1.seradpa.com:
+    url: grpc://localhost:8051
+    grpcOptions:
+      ssl-target-name-override: seradpa-peer1.seradpa.com
+    # tlsCACerts:
+    #   path: ../crypto/crypto-config/peerOrganizations/seradpa.com/peers/peer0.seradpa.com/tlscacerts/seradpa.com-cert.pem
+
+certificateAuthorities:
+  ca.caserver.com:
+    url: http://localhost:7054
+    httpOptions:
+      verify: false
+    # tlsCACerts:
+    #   path: ../crypto/crypto-config/peerOrganizations/5bloques.com/ca/cert.pem
+    registrar:
+      - enrollId: admin
+        enrollSecret: adminpw
+    caName: caserver
+
